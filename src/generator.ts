@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
+import { encode as toonEncode } from "@toon-format/toon";
 import type { EndpointData, SkillConfig } from "./types.js";
 
 /**
@@ -35,11 +36,16 @@ async function generateSingleFile(
   }
 
   for (const ep of endpoints) {
-    content += generateEndpointMarkdown(ep, config);
+    content +=
+      config.format === "toon"
+        ? generateEndpointToon(ep, config)
+        : generateEndpointMarkdown(ep, config);
     content += `\n---\n\n`;
   }
 
-  fs.writeFileSync(path.join(outDir, "api-skills.md"), content);
+  const fileName =
+    config.format === "toon" ? "api-skills.toon" : "api-skills.md";
+  fs.writeFileSync(path.join(outDir, fileName), content);
 }
 
 async function generateMultipleFiles(
@@ -47,10 +53,15 @@ async function generateMultipleFiles(
   config: SkillConfig,
   outDir: string,
 ): Promise<void> {
+  const ext = config.format === "toon" ? "toon" : "md";
+
   // 1. Generate individual endpoint files
   for (const ep of endpoints) {
-    const content = generateEndpointMarkdown(ep, config);
-    fs.writeFileSync(path.join(outDir, `${ep.operationId}.md`), content);
+    const content =
+      config.format === "toon"
+        ? generateEndpointToon(ep, config)
+        : generateEndpointMarkdown(ep, config);
+    fs.writeFileSync(path.join(outDir, `${ep.operationId}.${ext}`), content);
   }
 
   // 2. Generate standard index.md
@@ -60,7 +71,7 @@ async function generateMultipleFiles(
   }
 
   for (const ep of endpoints) {
-    indexContent += `- [${ep.method} ${ep.path}](./${ep.operationId}.md) - ${ep.summary || ep.operationId}\n`;
+    indexContent += `- [${ep.method} ${ep.path}](./${ep.operationId}.${ext}) - ${ep.summary || ep.operationId}\n`;
   }
 
   fs.writeFileSync(path.join(outDir, "index.md"), indexContent);
@@ -75,7 +86,7 @@ async function generateMultipleFiles(
     if (ep.semanticRoutingHints && ep.semanticRoutingHints.length > 0) {
       llmsTxt += `[Hints]: ${ep.semanticRoutingHints.join(" ")}\n`;
     }
-    llmsTxt += `[Docs]: ./${ep.operationId}.md\n\n`;
+    llmsTxt += `[Docs]: ./${ep.operationId}.${ext}\n\n`;
   }
 
   fs.writeFileSync(path.join(outDir, "llms.txt"), llmsTxt);
@@ -155,4 +166,62 @@ function generateEndpointMarkdown(
   }
 
   return md;
+}
+
+/**
+ * Generates TOON (Token-Oriented Object Notation) for an endpoint.
+ * Highly optimized for token efficiency by using a YAML-like structure
+ * and stripping away Markdown verbosity.
+ */
+function generateEndpointToon(ep: EndpointData, config: SkillConfig): string {
+  let toon = `Endpoint: ${ep.method} ${ep.path}\n`;
+  if (ep.summary) toon += `Summary: ${ep.summary}\n`;
+
+  if (config.prompts?.endpointContext) {
+    toon += `Instruction: ${config.prompts.endpointContext}\n`;
+  }
+
+  if (ep.securityRequirements && ep.securityRequirements.length > 0) {
+    toon += `Auth: ${ep.securityRequirements.join(",")}\n`;
+  }
+
+  // Curl - still keeping it but maybe more compact
+  const reqBody = ep.requestBody?.[0];
+  let curl = `curl -X ${ep.method} "${config.baseUrl}${ep.path}"`;
+  if (ep.securityRequirements?.length)
+    curl += ` -H "Authorization: Bearer <TOKEN>"`;
+  if (reqBody?.contentType)
+    curl += ` -H "Content-Type: ${reqBody.contentType}"`;
+  if (reqBody) curl += ` -d '{}'`;
+  toon += `Curl: ${curl}\n`;
+
+  if (ep.parameters.length > 0) {
+    toon += `Params:\n`;
+    for (const p of ep.parameters) {
+      toon += `  - ${p.name} (${p.in},${p.type})${p.required ? "*" : ""}: ${p.description || ""}`;
+      if (p.example !== undefined) toon += ` Ex: ${toonEncode(p.example)}`;
+      toon += "\n";
+    }
+  }
+
+  if (ep.requestBody && ep.requestBody.length > 0) {
+    toon += `Body:\n`;
+    for (const body of ep.requestBody) {
+      if (body.contentType) toon += `  Type: ${body.contentType}\n`;
+      if (body.schemaDetails) {
+        toon += `  Shape: ${toonEncode(body.schemaDetails)}\n`;
+      }
+    }
+  }
+
+  if (ep.responses && ep.responses.length > 0) {
+    toon += `Responses:\n`;
+    for (const res of ep.responses) {
+      toon += `  - ${res.statusCode}: ${res.description}`;
+      if (res.example !== undefined) toon += ` Ex: ${toonEncode(res.example)}`;
+      toon += "\n";
+    }
+  }
+
+  return toon;
 }

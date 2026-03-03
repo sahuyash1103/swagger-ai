@@ -18,7 +18,7 @@ npm install swagger-ai
 
 ## Features
 
-- **Token Optimization**: Strips down massive, deeply nested JSON schemas into simplified TypeScript-like interfaces.
+- **Token Optimization**: Strips down massive, deeply nested JSON schemas into simplified TypeScript-like interfaces. Support for **TOON (Token-Oriented Object Notation)** for even better token efficiency.
 - **AI SEO (`llms.txt`)**: Automatically generates an `llms.txt` file which acts as a "robots.txt" or "sitemap" for AI models, providing high-level semantic routing.
 - **cURL Generation**: Automatically constructs precise `curl` commands so the LLM doesn't have to guess how to format headers, auth, or paths.
 - **Prompt Injection**: Allows you to strictly guide the LLM's behavior per endpoint (e.g., "Always double-check the ID format before calling this").
@@ -116,6 +116,7 @@ The `generateAiSkills` function takes two arguments: the `swaggerDoc` object, an
 | `baseUrl` | `string` | **Required** | The base URL the LLM should use in the generated curl commands. |
 | `outputDir` | `string` | `'./llm-skills'` | Where the markdown files will be generated. |
 | `outputMode` | `'single' \| 'multiple'` | `'multiple'` | `single` generates one massive file. `multiple` creates an `index.md`, `llms.txt`, and separate files per endpoint. |
+| `format` | `'markdown' \| 'toon'` | `'markdown'` | `markdown` produces standard descriptive Markdown. `toon` produces a highly compact YAML-like format optimized for LLM token efficiency. |
 | `endpoints.include` | `(string\|RegExp)[]` | `[]` (all) | Only generate skills for these paths. |
 | `endpoints.exclude` | `(string\|RegExp)[]` | `[]` (none) | Do not generate skills for these paths. |
 | `endpoints.methods` | `string[]` | `[]` (all) | Only include specific methods (e.g., `['get', 'post']`). |

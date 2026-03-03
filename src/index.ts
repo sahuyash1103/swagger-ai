@@ -12,7 +12,7 @@ export * from "./types.js";
  * @param config Configuration options to shape the LLM output.
  */
 export async function generateAiSkills(
-  swaggerDoc: any,
+  swaggerDoc: Record<string, unknown>,
   config: SkillConfig,
 ): Promise<void> {
   if (!swaggerDoc || typeof swaggerDoc !== "object") {

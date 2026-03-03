@@ -94,4 +94,26 @@ describe("Skill Generator", () => {
     );
     expect(getUserContent).toContain('-H "Authorization: Bearer <YOUR_TOKEN>"');
   });
+
+  it("generates TOON format when requested", async () => {
+    await generateAiSkills(mockSwagger, {
+      baseUrl: "http://api.mysite.com",
+      outputDir: outDir,
+      format: "toon",
+    });
+
+    expect(fs.existsSync(path.join(outDir, "getUsers.toon"))).toBe(true);
+    expect(fs.existsSync(path.join(outDir, "llms.txt"))).toBe(true);
+
+    const toonContent = fs.readFileSync(
+      path.join(outDir, "getUsers.toon"),
+      "utf-8",
+    );
+    expect(toonContent).toContain("Endpoint: GET /users");
+    expect(toonContent).toContain("Summary: Get all users");
+    expect(toonContent).not.toContain("## GET"); // Should not have markdown headers
+
+    const llmsTxt = fs.readFileSync(path.join(outDir, "llms.txt"), "utf-8");
+    expect(llmsTxt).toContain("[Docs]: ./getUsers.toon");
+  });
 });

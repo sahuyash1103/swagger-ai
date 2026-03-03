@@ -8,6 +8,7 @@ export interface EndpointFilter {
 }
 
 export type OutputMode = "single" | "multiple";
+export type SkillFormat = "markdown" | "toon";
 
 export interface SkillPrompts {
   /** Prompt injected at the beginning of the skill document. */
@@ -21,6 +22,8 @@ export interface SkillConfig {
   outputDir?: string;
   /** Choose 'single' for one large file, or 'multiple' for index-based routing. Defaults to 'multiple'. */
   outputMode?: OutputMode;
+  /** The format of the generated skill files. Defaults to 'markdown'. */
+  format?: SkillFormat;
   /** Filters for which endpoints to include. */
   endpoints?: EndpointFilter;
   /** Custom prompts to guide the LLM. */
@@ -35,22 +38,28 @@ export interface EndpointParameter {
   description?: string;
   required: boolean;
   type: string;
-  example?: any;
+  example?: unknown;
 }
 
 export interface EndpointBody {
   contentType: string;
-  schemaDetails: any; // A simplified representation of the schema
+  schemaDetails: SimplifiedSchema; // A simplified representation of the schema
   description?: string;
-  example?: any;
+  example?: unknown;
 }
 
 export interface EndpointResponse {
   statusCode: string;
   description: string;
-  schemaDetails?: any;
-  example?: any;
+  schemaDetails?: SimplifiedSchema;
+  example?: unknown;
 }
+
+export type SimplifiedSchema =
+  | string
+  | { [key: string]: SimplifiedSchema }
+  | SimplifiedSchema[]
+  | undefined;
 
 export interface EndpointData {
   path: string;

@@ -47,6 +47,7 @@
     "vitest": "^4.0.18"
   },
   "dependencies": {
+    "@toon-format/toon": "^2.1.0",
     "openapi-types": "^12.1.3"
   }
 }
