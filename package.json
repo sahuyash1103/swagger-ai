@@ -1,21 +1,42 @@
 {
   "name": "swagger-ai",
   "version": "1.0.0",
-  "description": "",
+  "description": "Turn your Swagger/OpenAPI specs into LLM-optimized AI Skill documentation",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
     "build": "tsup src/index.ts --format esm --dts",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint src/ test/",
-    "lint:fix": "eslint src/ test/ --fix"
+    "lint:fix": "eslint src/ test/ --fix",
+    "prepublishOnly": "npm run build && npm run test"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "swagger",
+    "openapi",
+    "llm",
+    "ai",
+    "documentation",
+    "skill",
+    "llms.txt",
+    "ai-seo",
+    "markdown",
+    "api"
+  ],
+  "author": "yash_sahu",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sahuyash1103/swagger-ai.git"
+  },
+  "homepage": "https://github.com/sahuyash1103/swagger-ai#readme",
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/node": "^25.3.3",
