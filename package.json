@@ -1,0 +1,31 @@
+{
+  "name": "swagger-ai",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src/ test/",
+    "lint:fix": "eslint src/ test/ --fix"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^25.3.3",
+    "eslint": "^10.0.2",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.56.1",
+    "vitest": "^4.0.18"
+  },
+  "dependencies": {
+    "openapi-types": "^12.1.3"
+  }
+}
