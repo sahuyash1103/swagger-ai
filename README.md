@@ -69,6 +69,17 @@ async function bootstrap() {
 bootstrap();
 ```
 
+### Token-Optimized Mode (TOON)
+
+For maximum token efficiency, you can use the `toon` format. This generates extremely compact output that strips away Markdown verbosity while keeping 100% of the API context for the LLM.
+
+```typescript
+await generateAiSkills(swaggerSpec, {
+  baseUrl: 'https://api.myapp.com',
+  format: 'toon' // Use Token-Oriented Object Notation
+});
+```
+
 ### Example: NestJS
 
 In your `main.ts`:
